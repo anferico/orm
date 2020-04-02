@@ -65,7 +65,7 @@ public class Publisher {
     public List<Book> books;
 }
 ```
-and here's the corresponding SQL schema:
+and here's the generated SQL schema:
 ```SQL
 CREATE TABLE book (
     id INT NOT NULL PRIMARY KEY,
