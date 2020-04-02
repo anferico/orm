@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 
-namespace AnnotationsProject
+namespace CodeGeneration
 {
-	class MainClass
+	class Program
 	{
 		public static void Main(string[] args)
 		{

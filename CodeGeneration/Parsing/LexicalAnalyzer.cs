@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AnnotationsProject {
-	public class LexicalAnalyzer {
+namespace CodeGeneration 
+{
+	public class LexicalAnalyzer 
+    {
 		private string inputString;
 		private int cursorPosition = 0;
 		private List<char> redundantCharacters = new List<char>() {
@@ -17,25 +19,33 @@ namespace AnnotationsProject {
 		private string nextTokenValue;
 		private bool withinParentheses = false;
 
-		public LexicalAnalyzer(string inputString) {
+		public LexicalAnalyzer(string inputString) 
+        {
 			this.inputString = inputString;
 		}
 
-		private char? Peek() {
+		private char? Peek() 
+        {
 			if (inputString.Length > cursorPosition)
-				return inputString[cursorPosition];
+			{
+                return inputString[cursorPosition];
+            }
 			return null;
 		}
 
-		private void BuildNextToken() {
+		private void BuildNextToken() 
+        {
 			char? currentChar;
-			do {
+			do 
+            {
 				currentChar = Peek();
 				cursorPosition++;
 			} while (currentChar != null && redundantCharacters.Contains((char)currentChar));
-			nextTokenValue = null;
+			
+            nextTokenValue = null;
 
-			switch (currentChar) {
+			switch (currentChar) 
+            {
 				case '@':
 					lookahead = Token.AT;
 					break;
@@ -57,12 +67,15 @@ namespace AnnotationsProject {
 				case '"':
 					var strBuilder = new StringBuilder();
 					currentChar = Peek();
-					while (currentChar != null && currentChar != '"') {
+
+					while (currentChar != null && currentChar != '"') 
+                    {
 						strBuilder.Append(currentChar);
 						cursorPosition++;
 						currentChar = Peek();
 					}
 					cursorPosition++;
+
 					lookahead = Token.QUOTEDLITERAL;
 					nextTokenValue = strBuilder.ToString();
 					break;
@@ -93,7 +106,9 @@ namespace AnnotationsProject {
 
 				default:
 					strBuilder = new StringBuilder();
-					while (currentChar != null && !specialCharacters.Contains(currentChar)) {
+					while (currentChar != null && 
+                          !specialCharacters.Contains(currentChar)) 
+                    {
 						strBuilder.Append(currentChar);
 						currentChar = Peek();
 						cursorPosition++;
@@ -101,62 +116,85 @@ namespace AnnotationsProject {
 					cursorPosition--;
 
 					string parsedString = strBuilder.ToString();
-					switch (parsedString) {
+					switch (parsedString) 
+                    {
 						case "Table":
 							lookahead = Token.TABLE;
 							break;
+
 						case "Id":
 							lookahead = Token.ID;
 							break;
+
 						case "Column":
 							lookahead = Token.COLUMN;
 							break;
+
 						case "One2Many":
 						case "Many2One":
 							lookahead = Token.RELATIONSHIP;
 							nextTokenValue = parsedString;
 							break;
+
 						case "name":
 							if (withinParentheses)
-								lookahead = Token.NAME;
-							else {
+							{
+                                lookahead = Token.NAME;
+                            }
+							else 
+                            {
 								lookahead = Token.LITERAL;
 								nextTokenValue = parsedString;
 							}
 							break;
+
 						case "length":
 							if (withinParentheses)
-								lookahead = Token.LENGTH;
-							else {
+							{
+                                lookahead = Token.LENGTH;
+                            }
+							else 
+                            {
 								lookahead = Token.LITERAL;
 								nextTokenValue = parsedString;
 							}
 							break;
+
 						case "target":
 							if (withinParentheses)
-								lookahead = Token.TARGET;
-							else {
+							{
+                                lookahead = Token.TARGET;
+                            }
+							else 
+                            {
 								lookahead = Token.LITERAL;
 								nextTokenValue = parsedString;
 							}
 							break;
+
 						case "mappedBy":
 							if (withinParentheses)
-								lookahead = Token.MAPPEDBY;
-							else {
+							{
+                                lookahead = Token.MAPPEDBY;
+                            }
+							else 
+                            {
 								lookahead = Token.LITERAL;
 								nextTokenValue = parsedString;
 							}
 							break;
+
 						case "private":
 						case "protected":
 						case "public":
 							lookahead = Token.MODIFIER;
 							nextTokenValue = parsedString;
 							break;
+
 						case "interface":
 							lookahead = Token.INTERFACE;
 							break;
+
 						default:
 							lookahead = Token.LITERAL;
 							nextTokenValue = parsedString;
@@ -166,17 +204,22 @@ namespace AnnotationsProject {
 			}
 		}
 
-		public Token GetNextToken() {
+		public Token GetNextToken() 
+        {
 			Token nextToken = Lookahead;
 			TokenValue = nextTokenValue;
 			BuildNextToken();
 			return nextToken;
 		}
 
-		public Token Lookahead {
-			get {
+		public Token Lookahead 
+        {
+			get 
+            {
 				if (lookahead == null)
-					BuildNextToken();
+				{
+                    BuildNextToken();
+                }
 				return (Token)lookahead;
 			}
 		}

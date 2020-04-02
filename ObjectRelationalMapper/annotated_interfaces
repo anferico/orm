@@ -1,0 +1,19 @@
+@Table(name="book")
+public interface Book {
+	@Id(name="id")
+	Integer id;
+	@Column(name="title", length="80")
+	String title;
+	@Many2One(name="publisher", target="Publisher")
+	Publisher publisher;
+}
+
+@Table(name="publisher")
+public interface Publisher {
+	@Id(name="id")
+	Integer id;
+	@Column(name="name", length="80")
+	String name;
+	@One2Many(name="books", target="Book", mappedBy="publisher")
+	List<Book> books;
+}

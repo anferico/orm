@@ -1,0 +1,1 @@
+using System.Collections.Generic; namespace CodeGeneration {public class Book {public int id;public string title;public Publisher publisher;}}
