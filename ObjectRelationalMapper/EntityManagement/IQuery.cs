@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace ObjectRelationalMapper 
 {
-	public interface IQuery<T> 
+    public interface IQuery<T> 
     {
-		List<T> getResultList();
-		void execute();
-	}
+        List<T> getResultList();
+        void execute();
+    }
 }

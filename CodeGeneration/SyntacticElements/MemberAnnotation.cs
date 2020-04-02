@@ -2,16 +2,16 @@
 
 namespace CodeGeneration 
 {
-	public class MemberAnnotation : Annotation 
+    public class MemberAnnotation : Annotation 
     {
-		public string FieldType;
-		public string FieldName;
+        public string FieldType;
+        public string FieldName;
 
-		public MemberAnnotation(
+        public MemberAnnotation(
             string annotationName, string fieldType, string fieldName
         ) : base(annotationName) {
-			FieldType = fieldType;
-			FieldName = fieldName;
-		}
-	}
+            FieldType = fieldType;
+            FieldName = fieldName;
+        }
+    }
 }

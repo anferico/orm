@@ -5,41 +5,41 @@ using System.IO;
 
 namespace CodeGeneration 
 {
-	public class CodeGenerator 
+    public class CodeGenerator 
     {
-		Dictionary<string, string> langToCSharp = new Dictionary<string, string>() {
-			{"Integer", "int"}, 
+        Dictionary<string, string> langToCSharp = new Dictionary<string, string>() {
+            {"Integer", "int"}, 
             {"Float", "float"}, 
             {"Double", "double"},
-			{"Boolean", "bool"}, 
+            {"Boolean", "bool"}, 
             {"Char", "char"}, 
             {"String", "string"}
-		};
+        };
 
-		Dictionary<string, string> langToSQL = new Dictionary<string, string>() {
-			{"Integer", "INT"}, 
+        Dictionary<string, string> langToSQL = new Dictionary<string, string>() {
+            {"Integer", "INT"}, 
             {"Float", "FLOAT"}, 
             {"Double", "DOUBLE PRECISION"},
-			{"Boolean", "BOOLEAN"}, 
+            {"Boolean", "BOOLEAN"}, 
             {"Char", "CHARACTER"}, 
             {"String", "VARCHAR"}
-		};
+        };
 
-		List<TableAnnotation> tableAnnotations;
+        List<TableAnnotation> tableAnnotations;
 
-		public CodeGenerator(List<TableAnnotation> tableAnnotations) 
+        public CodeGenerator(List<TableAnnotation> tableAnnotations) 
         {
-			this.tableAnnotations = tableAnnotations;
-		}
+            this.tableAnnotations = tableAnnotations;
+        }
 
-		public void GeneratePlainCode() 
+        public void GeneratePlainCode() 
         {
-			foreach (var tabAnn in tableAnnotations) 
+            foreach (var tabAnn in tableAnnotations) 
             {
                 string csharpCode = GenerateInterfaceCode(tabAnn);
-				byte[] csharpCodeBinary = Encoding.ASCII.GetBytes(csharpCode);
+                byte[] csharpCodeBinary = Encoding.ASCII.GetBytes(csharpCode);
 
-				FileStream fileStream = File.Create(
+                FileStream fileStream = File.Create(
                     $"./{tabAnn.InterfaceName}.cs"
                 );
                 
@@ -48,46 +48,46 @@ namespace CodeGeneration
                 );
 
                 fileStream.Close();
-			}
-		}
+            }
+        }
 
-		private string GenerateInterfaceCode(TableAnnotation tabAnn) 
+        private string GenerateInterfaceCode(TableAnnotation tabAnn) 
         {
-			var strBuilder = new StringBuilder();
+            var strBuilder = new StringBuilder();
 
-			strBuilder.Append(
+            strBuilder.Append(
                 $"using System.Collections.Generic; namespace CodeGeneration {{" +
-				$"{tabAnn.InterfaceModifier} class {tabAnn.InterfaceName} {{"
+                $"{tabAnn.InterfaceModifier} class {tabAnn.InterfaceName} {{"
             );
 
-			foreach (var membAnn in tabAnn.MemberAnnotations)
-			{
+            foreach (var membAnn in tabAnn.MemberAnnotations)
+            {
                 strBuilder.Append(GenerateInterfaceCode(membAnn));
             }
-			
+            
             strBuilder.Append("}}");
-			return strBuilder.ToString();
-		}
+            return strBuilder.ToString();
+        }
 
-		private string GenerateInterfaceCode(MemberAnnotation membAnn) 
+        private string GenerateInterfaceCode(MemberAnnotation membAnn) 
         {
-			if (membAnn.AnnotationName == "One2Many" ||
-				membAnn.AnnotationName == "Many2One")
+            if (membAnn.AnnotationName == "One2Many" ||
+                membAnn.AnnotationName == "Many2One")
             {
-				return $"public {membAnn.FieldType} {membAnn.FieldName};";   
+                return $"public {membAnn.FieldType} {membAnn.FieldName};";   
             }
 
-			return $"public {langToCSharp[membAnn.FieldType]} {membAnn.FieldName};";
-		}
+            return $"public {langToCSharp[membAnn.FieldType]} {membAnn.FieldName};";
+        }
 
-		public void GenerateDatabaseSchema() 
+        public void GenerateDatabaseSchema() 
         {
-			foreach (var tabAnn in tableAnnotations) 
+            foreach (var tabAnn in tableAnnotations) 
             {
                 string sqlCode = GenerateSQLCode(tabAnn);
-				byte[] sqlCodeBinary = Encoding.ASCII.GetBytes(sqlCode);
+                byte[] sqlCodeBinary = Encoding.ASCII.GetBytes(sqlCode);
 
-				FileStream fileStream = File.Create(
+                FileStream fileStream = File.Create(
                     $"./{tabAnn.Attributes["name"]}.sql"
                 );
                 
@@ -96,100 +96,100 @@ namespace CodeGeneration
                 );
 
                 fileStream.Close();
-			}
-		}
+            }
+        }
 
-		private string GenerateSQLCode(TableAnnotation tabAnn) 
+        private string GenerateSQLCode(TableAnnotation tabAnn) 
         {
-			var strBuilder = new StringBuilder();
-			strBuilder.Append($"CREATE TABLE {tabAnn.Attributes["name"]} (");
+            var strBuilder = new StringBuilder();
+            strBuilder.Append($"CREATE TABLE {tabAnn.Attributes["name"]} (");
 
-			for (int i = 0; i < tabAnn.MemberAnnotations.Count; i++) 
+            for (int i = 0; i < tabAnn.MemberAnnotations.Count; i++) 
             {
-				string attrCode = GenerateSQLCode(tabAnn.MemberAnnotations[i]);
-				if (string.IsNullOrEmpty(attrCode) && strBuilder.Length >= 2)
-				{
-					strBuilder.Remove(strBuilder.Length - 2, 2);
+                string attrCode = GenerateSQLCode(tabAnn.MemberAnnotations[i]);
+                if (string.IsNullOrEmpty(attrCode) && strBuilder.Length >= 2)
+                {
+                    strBuilder.Remove(strBuilder.Length - 2, 2);
                 }
                 else
-				{
+                {
                     strBuilder.Append(attrCode);
                 }
 
-				if (i < tabAnn.MemberAnnotations.Count - 1)
-				{
+                if (i < tabAnn.MemberAnnotations.Count - 1)
+                {
                     strBuilder.Append(", ");
                 }
-			}
+            }
 
-			strBuilder.Append(");");
-			return strBuilder.ToString();
-		}
+            strBuilder.Append(");");
+            return strBuilder.ToString();
+        }
 
-		private string GenerateSQLCode(MemberAnnotation membAnn) 
+        private string GenerateSQLCode(MemberAnnotation membAnn) 
         {
-			var strBuilder = new StringBuilder();
-			switch (membAnn.AnnotationName) 
+            var strBuilder = new StringBuilder();
+            switch (membAnn.AnnotationName) 
             {
-				case "Id":
-					strBuilder.Append(
+                case "Id":
+                    strBuilder.Append(
                         $"{membAnn.Attributes["name"]} {GetSQLType(membAnn.FieldType)} " +
-						"NOT NULL PRIMARY KEY"
+                        "NOT NULL PRIMARY KEY"
                     );
 
-					break;
+                    break;
 
-				case "Column":
-					strBuilder.Append($"{membAnn.Attributes["name"]} {GetSQLType(membAnn.FieldType)}");
+                case "Column":
+                    strBuilder.Append($"{membAnn.Attributes["name"]} {GetSQLType(membAnn.FieldType)}");
 
-					if (membAnn.Attributes.ContainsKey("length") && membAnn.FieldType == "String")
-					{
+                    if (membAnn.Attributes.ContainsKey("length") && membAnn.FieldType == "String")
+                    {
                         strBuilder.Append($"({membAnn.Attributes["length"]})");
                     }
 
-					break;
-
-				case "Many2One":
-					string name = membAnn.Attributes["name"];
-					strBuilder.Append($"{name} ");
-
-					var tabAnn = tableAnnotations.Find(ann =>
-						ann.InterfaceName == membAnn.Attributes["target"]
-					);
-
-					var referencedMemb = tabAnn.MemberAnnotations.Find(mem =>
-						mem.AnnotationName == "Id"
-					);
-
-					string sqlType = langToSQL[referencedMemb.FieldType];
-					strBuilder.Append($"{sqlType}, FOREIGN KEY ({name}) REFERENCES " +
-									  $"{tabAnn.Attributes["name"]}" +
-									  $"({referencedMemb.Attributes["name"]})");
-					
                     break;
-			}
 
-			return strBuilder.ToString();
-		}
+                case "Many2One":
+                    string name = membAnn.Attributes["name"];
+                    strBuilder.Append($"{name} ");
 
-		private string GetCSharpType(string type) 
+                    var tabAnn = tableAnnotations.Find(ann =>
+                        ann.InterfaceName == membAnn.Attributes["target"]
+                    );
+
+                    var referencedMemb = tabAnn.MemberAnnotations.Find(mem =>
+                        mem.AnnotationName == "Id"
+                    );
+
+                    string sqlType = langToSQL[referencedMemb.FieldType];
+                    strBuilder.Append($"{sqlType}, FOREIGN KEY ({name}) REFERENCES " +
+                                      $"{tabAnn.Attributes["name"]}" +
+                                      $"({referencedMemb.Attributes["name"]})");
+                    
+                    break;
+            }
+
+            return strBuilder.ToString();
+        }
+
+        private string GetCSharpType(string type) 
         {
-			if (!langToCSharp.ContainsKey(type))
-			{
+            if (!langToCSharp.ContainsKey(type))
+            {
                 throw new Exception($"Unknown type {type}.");
             }
 
-			return langToCSharp[type];
-		}
+            return langToCSharp[type];
+        }
 
-		private string GetSQLType(string type) 
+        private string GetSQLType(string type) 
         {
-			if (!langToSQL.ContainsKey(type))
-			{
+            if (!langToSQL.ContainsKey(type))
+            {
                 throw new Exception($"Unknown type {type}.");
             }
 
-			return langToSQL[type];
-		}
-	}
+            return langToSQL[type];
+        }
+    }
 }
