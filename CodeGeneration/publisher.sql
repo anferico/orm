@@ -1,1 +1,0 @@
-CREATE TABLE publisher (id INT NOT NULL PRIMARY KEY, name VARCHAR(80));

@@ -1,1 +1,0 @@
-CREATE TABLE book (id INT NOT NULL PRIMARY KEY, title VARCHAR(80), publisher INT, FOREIGN KEY (publisher) REFERENCES publisher(id));
