@@ -1,5 +1,5 @@
 # Object Relational Mapper
-A simple code generator and Object Relational Mapper (ORM) written in C#.
+A C# code generator and an Object Relational Mapper (ORM), written in C#.
 
 The goal of this project is twofold. On the one hand, we want to take annotated interface declarations and use them to create valid C# code and a corresponding SQL schema. On the other hand, we want to implement a simple ORM that's able to persist objects in main memory to disk by storing them as database rows. We also seek to do the opposite, namely retrieving records from a database and turn them into objects (i.e. instances of a class) in memory.
 
