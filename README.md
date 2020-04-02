@@ -83,3 +83,10 @@ CREATE TABLE publisher (
 ```
 
 ## Object Relational Mapper
+The key class for this part of the project is `EntityManager` (located in [ObjectRelationalMapper/EntityManagement/EntityManager.cs](ObjectRelationalMapper/EntityManagement/EntityManager.cs)). `EntityManager` is used to turn class instances into database rows and vice-versa, and it does so by implementing methods for:
+ - persisting an object (of type `T`) to the database
+ - removing the record that corresponds to a given object (of type `T`) from the database 
+ - retrieving a record from the database and using it to instantiate an object (of type `T`)
+ 
+## Usage
+If you want to test the functionalities of this system, run [CodeGeneration/Program.cs](CodeGeneration/Program.cs) to generate C# class declarations and a SQL schema definition for the interfaces in [CodeGeneration/annotated_interfaces](CodeGeneration/annotated_interfaces) (in this case, they are `Book` and `Publisher`), then run [ObjectRelationalMapper/Program.cs](ObjectRelationalMapper/Program.cs) to create some instances of the generated classes and store them as records in a SQLite database.
